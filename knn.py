@@ -1,6 +1,8 @@
 import numpy as np
 from scipy.spatial import distance
 
+from sklearn.base import BaseEstimator
+
 def euclidian_distances_not_vectorized(test, train):
     distances = []
     for row in train:
@@ -34,27 +36,36 @@ def cosine_distances(test, train):
     return 1.0 - np.divide(np.sum(t*train, axis=1), (np.linalg.norm(test) * np.linalg.norm(train, axis=1)))
 
 
-class KNN():
+class KNN(BaseEstimator):
     """
     # KNN algorithm implementation based on
     # https://towardsdatascience.com/k-nearest-neighbors-classification-from-scratch-with-numpy-cb222ecfeac1
     """
-    def __init__(self, X_train, y_train, n_neighbors=5, weights='uniform', distance_fn=euclidian_distances):
-
-        self.X_train = X_train
-        self.y_train = y_train
-
+    def __init__(self, n_neighbors=5, weights='uniform', metric='euclidean'):
         self.n_neighbors = n_neighbors
         self.weights = weights
 
-        self.n_classes = 3
+        self.metric = metric
+        
+        self.n_classes = 10
 
-        self.distance_fn = distance_fn
+    def fit(self, X_train, y_train):
+        self.X_train = X_train
+        self.y_train = y_train
 
     def kneighbors(self, X_test, return_distance=False):
 
         dist = []
         neigh_ind = []
+
+        if self.metric == 'euclidean':
+            self.distance_fn = euclidian_distances
+        elif self.metric == 'chebyshev':
+            self.distance_fn = chebyshev_distances
+        elif self.metric == 'cosine':
+            self.distance_fn = cosine_distances
+        else:
+            raise AttributeError("distance_fn is not initialized")
 
         point_dist = [self.distance_fn(x_test, self.X_train) for x_test in X_test]
 
@@ -145,7 +156,8 @@ if __name__ == '__main__':
     y_train = y_train.astype(int)
     y_test = y_test.astype(int)
 
-    our_classifier = KNN(X_train, y_train, n_neighbors=3, weights='distance')
+    our_classifier = KNN(n_neighbors=3, weights='distance', metric='cosine')
+    our_classifier.fit(X_train, y_train)
     our_accuracy = our_classifier.score(X_test, y_test)
 
     print(our_accuracy)
