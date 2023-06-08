@@ -34,12 +34,12 @@ def cosine_distances(test, train):
     return 1.0 - np.divide(np.sum(t*train, axis=1), (np.linalg.norm(test) * np.linalg.norm(train, axis=1)))
 
 
-class KNearestNeighbors():
+class KNN():
     """
     # KNN algorithm implementation based on
     # https://towardsdatascience.com/k-nearest-neighbors-classification-from-scratch-with-numpy-cb222ecfeac1
     """
-    def __init__(self, X_train, y_train, n_neighbors=5, weights='uniform'):
+    def __init__(self, X_train, y_train, n_neighbors=5, weights='uniform', distance_fn=euclidian_distances):
 
         self.X_train = X_train
         self.y_train = y_train
@@ -49,7 +49,7 @@ class KNearestNeighbors():
 
         self.n_classes = 3
 
-        self.distance_fn = euclidian_distances
+        self.distance_fn = distance_fn
 
     def kneighbors(self, X_test, return_distance=False):
 
@@ -145,7 +145,7 @@ if __name__ == '__main__':
     y_train = y_train.astype(int)
     y_test = y_test.astype(int)
 
-    our_classifier = KNearestNeighbors(X_train, y_train, n_neighbors=3, weights='distance')
+    our_classifier = KNN(X_train, y_train, n_neighbors=3, weights='distance')
     our_accuracy = our_classifier.score(X_test, y_test)
 
     print(our_accuracy)

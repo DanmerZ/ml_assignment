@@ -2,6 +2,9 @@ import numpy as np
 import pandas as pd
 import librosa
 import os, json
+from sklearn.model_selection import train_test_split
+
+RANDOM_STATE = 42
 
 class AudioFeatureExtractor:
     def __init__(self) -> None:
@@ -58,12 +61,6 @@ def extract_features_from_urban8k_dataset(dataset_dir="input"):
             i += 1
             print(f"{i} {path}")
 
-        #     if i >= 20:
-        #         break
-
-        # if i >= 20:
-        #     break
-
     frame = pd.DataFrame.from_records(np.array(audio_files_info))
     frame.to_csv("extracted_features.csv")        
 
@@ -73,11 +70,21 @@ def extract_features_from_urban8k_dataset(dataset_dir="input"):
     return audio_files_info
 
 def read_features_from_csv(path_to_csv="extracted_features.csv"):
-    frame = pd.read_csv(path_to_csv)
-    print(frame.iloc[0]["features"])
+    # frame = pd.read_csv(path_to_csv, converters={'features': lambda x: np.array(pd.eval(x)) })
+    frame = pd.read_csv(path_to_csv, converters={'features': pd.eval })
+
+    train_frame, test_frame = train_test_split(frame, test_size=0.2, random_state=RANDOM_STATE)
+
+    x_train = np.array(train_frame["features"].values.tolist())
+    x_test = np.array(test_frame["features"].values.tolist())
+    
+    y_train = train_frame['class_id'].values
+    y_test = test_frame['class_id'].values
+
+    return (train_frame, test_frame, x_train, x_test, y_train, y_test) 
 
 
 if __name__ == '__main__':
-    extract_features_from_urban8k_dataset()
-    # read_features_from_csv()
+    # extract_features_from_urban8k_dataset()
+    read_features_from_csv()
 
