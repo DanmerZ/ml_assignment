@@ -2,28 +2,34 @@ import numpy as np
 import pandas as pd
 from torch.utils.data import Dataset, DataLoader
 from features import AudioFeatureExtractor, RANDOM_STATE
+from torchvision.transforms import ToTensor, Compose, Resize
 
 class Urban8kDataset(Dataset):
     def __init__(self, df):
         self.audio_info = df
         self.feature_extractor = AudioFeatureExtractor()
         self.cache = {}
+        self.transform = Compose([
+            ToTensor(),
+            Resize(size=(64,64)),
+        ])
 
     def __len__(self):
         return self.audio_info.shape[0]
-    
+
     def __getitem__(self, idx):
         if idx not in self.cache.keys():
             dataset_path = '.'
             path = dataset_path + '/' + self.audio_info.iloc[idx]['path']
-            label = self.audio_info.iloc[idx]['class']
+            label = self.audio_info.iloc[idx]['class_id']
             spectrogram = self.feature_extractor.spectrogram_from_file(path)
 
             self.cache[idx] = (spectrogram, label)
         else:
             spectrogram, label = self.cache[idx]
 
-        return (spectrogram, label)    
+        # return (self.transform(spectrogram).permute(1, 2, 0), label)
+        return (self.transform(spectrogram), label)
 
 def get_dataset_loaders(limit=None):
     from sklearn.model_selection import train_test_split
