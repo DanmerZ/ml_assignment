@@ -142,7 +142,7 @@ def read_features_from_pickle(path_to_pickle="extracted_features.pkl"):
     return (train_frame, test_frame, x_train, x_test, y_train, y_test, spectrogram_train, spectrogram_test) 
 
 if __name__ == '__main__':
-    extract_features_from_urban8k_dataset()
+    extract_features_from_urban8k_dataset(istop=None, pickle=True)
     # read_features_from_csv()
     # read_features_from_pickle()
     
