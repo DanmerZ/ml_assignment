@@ -10,6 +10,8 @@ transfrom = Compose([
     Resize(size=(64,64), antialias=True),
 ])
 
+BATCH_SIZE = 16
+
 class Urban8kDataset(Dataset):
     def __init__(self, df, load_from_pickle=False):
         self.audio_info = df
@@ -53,8 +55,8 @@ def get_dataset_loaders(limit=None, pickle=False):
     train_dataset = Urban8kDataset(train_frame, load_from_pickle=pickle)
     test_dataset = Urban8kDataset(test_frame, load_from_pickle=pickle)
 
-    train_loader = DataLoader(train_dataset, batch_size=16, shuffle=True)
-    test_loader = DataLoader(test_dataset, batch_size=16, shuffle=True)
+    train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
+    test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=True)
 
     return (train_loader, test_loader, train_dataset, test_dataset)
 

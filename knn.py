@@ -59,10 +59,16 @@ class KNN(BaseEstimator):
         self.n_classes = n_classes
 
     def fit(self, X_train, y_train):
+        """
+        Save train values
+        """
         self.X_train = X_train
         self.y_train = y_train
 
     def kneighbors(self, X_test, return_distance=False):
+        """
+        Return array of indices of n_neighbours and their distances to X_test
+        """
 
         dist = []
         neigh_ind = []
@@ -86,12 +92,14 @@ class KNN(BaseEstimator):
         return np.array(neigh_ind)
 
     def predict(self, X_test):
+        """
+        Make prediction
+        """
 
         if self.weights == 'uniform':
             neighbors = self.kneighbors(X_test)
             y_pred = np.array([
-                np.argmax(np.bincount(self.y_train[neighbor]))
-                for neighbor in neighbors
+                np.argmax(np.bincount(self.y_train[neighbor])) for neighbor in neighbors
             ])
 
             return y_pred

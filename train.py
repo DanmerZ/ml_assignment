@@ -104,6 +104,9 @@ def test_step(data_loader: torch.utils.data.DataLoader,
         print(f"Test loss: {test_loss:.5f} | Test accuracy: {test_acc:.2f}%\n")
 
 def train_vgg11(epochs=30):
+    """
+    Train VGG11 model and save weights
+    """
     torch.manual_seed(RANDOM_STATE)
 
     train_loader, test_loader, train_dataset, test_dataset = get_dataset_loaders(limit=None, pickle=True)
