@@ -41,22 +41,11 @@ class KNN(BaseEstimator):
     # KNN algorithm implementation based on
     # https://towardsdatascience.com/k-nearest-neighbors-classification-from-scratch-with-numpy-cb222ecfeac1
     """
-    def __init__(self, n_neighbors=5, weights='uniform', metric='euclidean'):
+    def __init__(self, n_neighbors=5, weights='uniform', metric='euclidean', n_classes=10):
         self.n_neighbors = n_neighbors
         self.weights = weights
 
         self.metric = metric
-        
-        self.n_classes = 10
-
-    def fit(self, X_train, y_train):
-        self.X_train = X_train
-        self.y_train = y_train
-
-    def kneighbors(self, X_test, return_distance=False):
-
-        dist = []
-        neigh_ind = []
 
         if self.metric == 'euclidean':
             self.distance_fn = euclidian_distances
@@ -66,6 +55,17 @@ class KNN(BaseEstimator):
             self.distance_fn = cosine_distances
         else:
             raise AttributeError("distance_fn is not initialized")
+        
+        self.n_classes = n_classes
+
+    def fit(self, X_train, y_train):
+        self.X_train = X_train
+        self.y_train = y_train
+
+    def kneighbors(self, X_test, return_distance=False):
+
+        dist = []
+        neigh_ind = []
 
         point_dist = [self.distance_fn(x_test, self.X_train) for x_test in X_test]
 

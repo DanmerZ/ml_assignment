@@ -5,15 +5,17 @@ from torchvision.transforms import ToTensor, Compose, Resize
 
 import pathlib
 
+transfrom = Compose([
+    ToTensor(),
+    Resize(size=(64,64), antialias=True),
+])
+
 class Urban8kDataset(Dataset):
     def __init__(self, df, load_from_pickle=False):
         self.audio_info = df
         self.feature_extractor = AudioFeatureExtractor()
         self.cache = {}
-        self.transform = Compose([
-            ToTensor(),
-            Resize(size=(64,64)),
-        ])
+        self.transform = transfrom
 
         self.load_from_pickle = load_from_pickle
         if self.load_from_pickle:
@@ -37,7 +39,6 @@ class Urban8kDataset(Dataset):
         else:
             spectrogram, label = self.cache[idx]
 
-        # return (self.transform(spectrogram).permute(1, 2, 0), label)
         return (self.transform(spectrogram), label)
 
 def get_dataset_loaders(limit=None, pickle=False):
