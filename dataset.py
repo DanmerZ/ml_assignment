@@ -13,7 +13,7 @@ transfrom = Compose([
 BATCH_SIZE = 16
 
 class Urban8kDataset(Dataset):
-    def __init__(self, df, load_from_pickle=False):
+    def __init__(self, df, load_from_pickle=False, pickle_file='data/extracted_features.pkl'):
         self.audio_info = df
         self.feature_extractor = AudioFeatureExtractor()
         self.cache = {}
@@ -21,7 +21,7 @@ class Urban8kDataset(Dataset):
 
         self.load_from_pickle = load_from_pickle
         if self.load_from_pickle:
-            self.frame = pd.read_pickle('data/extracted_features.pkl')
+            self.frame = pd.read_pickle(pickle_file)
 
     def __len__(self):
         return self.audio_info.shape[0]
@@ -43,17 +43,19 @@ class Urban8kDataset(Dataset):
 
         return (self.transform(spectrogram), label)
 
-def get_dataset_loaders(limit=None, pickle=False):
+def get_dataset_loaders(limit=None, pickle=False, project_dir='.'):
     from sklearn.model_selection import train_test_split
-    frame = pd.read_csv('data/extracted_features.csv')
+    extracted_features_csv=f'{project_dir}/data/extracted_features.csv'
+    frame = pd.read_csv(extracted_features_csv)
 
     if limit is not None:
         frame = frame[0:limit]
 
     train_frame, test_frame = train_test_split(frame, test_size=0.2, random_state=RANDOM_STATE)
 
-    train_dataset = Urban8kDataset(train_frame, load_from_pickle=pickle)
-    test_dataset = Urban8kDataset(test_frame, load_from_pickle=pickle)
+    pickle_file = f"{project_dir}/data/extracted_features.pkl"
+    train_dataset = Urban8kDataset(train_frame, load_from_pickle=pickle, pickle_file=pickle_file)
+    test_dataset = Urban8kDataset(test_frame, load_from_pickle=pickle, pickle_file=pickle_file)
 
     train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
     test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=True)

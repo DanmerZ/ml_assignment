@@ -56,21 +56,21 @@ class AudioFeatureExtractor:
         x, sr = librosa.load(path=file)
         return self.spectrogram(wav=x, sr=sr)
     
-def extract_features_from_urban8k_dataset(dataset_dir="input", istop=None, pickle=False):
+def extract_features_from_urban8k_dataset(project_root_dir=".", istop=None, pickle=False):
     """
     UrbanSound8K dataset
     http://serv.cusp.nyu.edu/projects/urbansounddataset
 
     Extracts features into CSV file
     """
-    df = pd.read_csv('input/metadata/UrbanSound8K.csv')
+    df = pd.read_csv(f'{project_root_dir}/input/metadata/UrbanSound8K.csv')
     feature_extractor = AudioFeatureExtractor()
 
     audio_files_info = []
     audio_files_info_pickle = []
 
     i = 1
-    for root, dirs, files in os.walk(f"{dataset_dir}/audio"):
+    for root, dirs, files in os.walk(f"{project_root_dir}/input/audio"):
         for file in files:
             if not file.endswith(".wav"):
                 continue
@@ -102,11 +102,11 @@ def extract_features_from_urban8k_dataset(dataset_dir="input", istop=None, pickl
             break
 
     frame = pd.DataFrame.from_records(np.array(audio_files_info))
-    frame.to_csv("data/extracted_features.csv")  
+    frame.to_csv(f"{project_root_dir}/data/extracted_features.csv")  
 
     if pickle:
         frame = pd.DataFrame.from_records(np.array(audio_files_info_pickle))
-        frame.to_pickle("data/extracted_features.pkl")
+        frame.to_pickle(f"{project_root_dir}/data/extracted_features.pkl")
           
     return audio_files_info
 
