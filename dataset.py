@@ -3,6 +3,8 @@ from torch.utils.data import Dataset, DataLoader
 from features import AudioFeatureExtractor, RANDOM_STATE
 from torchvision.transforms import ToTensor, Compose, Resize
 
+import pathlib
+
 class Urban8kDataset(Dataset):
     def __init__(self, df, load_from_pickle=False):
         self.audio_info = df
@@ -15,8 +17,7 @@ class Urban8kDataset(Dataset):
 
         self.load_from_pickle = load_from_pickle
         if self.load_from_pickle:
-            self.frame = pd.read_pickle('extracted_features.pkl')
-
+            self.frame = pd.read_pickle('data/extracted_features.pkl')
 
     def __len__(self):
         return self.audio_info.shape[0]
@@ -41,7 +42,7 @@ class Urban8kDataset(Dataset):
 
 def get_dataset_loaders(limit=None, pickle=False):
     from sklearn.model_selection import train_test_split
-    frame = pd.read_csv('extracted_features.csv')
+    frame = pd.read_csv('data/extracted_features.csv')
 
     if limit is not None:
         frame = frame[0:limit]

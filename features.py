@@ -102,15 +102,15 @@ def extract_features_from_urban8k_dataset(dataset_dir="input", istop=None, pickl
             break
 
     frame = pd.DataFrame.from_records(np.array(audio_files_info))
-    frame.to_csv("extracted_features.csv")  
+    frame.to_csv("data/extracted_features.csv")  
 
     if pickle:
         frame = pd.DataFrame.from_records(np.array(audio_files_info_pickle))
-        frame.to_pickle("extracted_features.pkl")
+        frame.to_pickle("data/extracted_features.pkl")
           
     return audio_files_info
 
-def read_features_from_csv(path_to_csv="extracted_features.csv"):
+def read_features_from_csv(path_to_csv="data/extracted_features.csv"):
     # frame = pd.read_csv(path_to_csv, converters={'features': lambda x: np.array(pd.eval(x)) })
     frame = pd.read_csv(path_to_csv, converters={'features': pd.eval })
 
@@ -124,7 +124,7 @@ def read_features_from_csv(path_to_csv="extracted_features.csv"):
 
     return (train_frame, test_frame, x_train, x_test, y_train, y_test) 
 
-def read_features_from_pickle(path_to_pickle="extracted_features.pkl"):
+def read_features_from_pickle(path_to_pickle="data/extracted_features.pkl"):
     frame = pd.read_pickle(path_to_pickle)
 
     train_frame, test_frame = train_test_split(frame, test_size=0.2, random_state=RANDOM_STATE)
