@@ -1,6 +1,7 @@
 import torch
 from model import VGG11
 from dataset import get_dataset_loaders
+import matplotlib.pyplot as plt
 
 from features import RANDOM_STATE
 
@@ -75,6 +76,8 @@ def train_step(model: torch.nn.Module,
     train_acc /= len(data_loader)
     print(f"Train loss: {train_loss:.5f} | Train accuracy: {train_acc:.2f}%")
 
+    return train_loss.item(), train_acc
+
 def test_step(data_loader: torch.utils.data.DataLoader,
               model: torch.nn.Module,
               loss_fn: torch.nn.Module,
@@ -103,6 +106,51 @@ def test_step(data_loader: torch.utils.data.DataLoader,
         test_acc /= len(data_loader)
         print(f"Test loss: {test_loss:.5f} | Test accuracy: {test_acc:.2f}%\n")
 
+        return test_loss.item(), test_acc
+    
+def plot_loss_curves(results):
+    """Plots training curves of a results dictionary.
+
+    Args:
+        results (dict): dictionary containing list of values, e.g.
+            {"train_loss": [...],
+             "train_acc": [...],
+             "test_loss": [...],
+             "test_acc": [...]}
+    """
+    
+    # Get the loss values of the results dictionary (training and test)
+    loss = results['train_loss']
+    test_loss = results['test_loss']
+
+    # Get the accuracy values of the results dictionary (training and test)
+    accuracy = results['train_acc']
+    test_accuracy = results['test_acc']
+
+    # Figure out how many epochs there were
+    epochs = range(len(results['train_loss']))
+
+    # Setup a plot 
+    plt.figure(figsize=(15, 7))
+
+    # Plot loss
+    plt.subplot(1, 2, 1)
+    plt.plot(epochs, loss, label='train_loss')
+    plt.plot(epochs, test_loss, label='test_loss')
+    plt.title('Loss')
+    plt.xlabel('Epochs')
+    plt.legend()
+
+    # Plot accuracy
+    plt.subplot(1, 2, 2)
+    plt.plot(epochs, accuracy, label='train_accuracy')
+    plt.plot(epochs, test_accuracy, label='test_accuracy')
+    plt.title('Accuracy')
+    plt.xlabel('Epochs')
+    plt.legend()
+
+    plt.savefig('metrics.png')
+
 def train_vgg11(epochs=30):
     """
     Train VGG11 model and save weights
@@ -117,24 +165,42 @@ def train_vgg11(epochs=30):
     loss_fn = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.SGD(params=vgg_model.parameters(), lr=0.1)
 
+    train_loss_arr = []
+    train_accuracy_arr = []
+    test_loss_arr = []
+    test_accuracy_arr = []
+
     for epoch in range(epochs):
         print(f"Epoch: {epoch}\n---------")
-        train_step(data_loader=train_loader,
+        train_loss, train_accuracy = train_step(data_loader=train_loader,
             model=vgg_model,
             loss_fn=loss_fn,
             optimizer=optimizer,
             accuracy_fn=accuracy_fn,
             device=device
         )
-        test_step(data_loader=test_loader,
+        test_loss, test_accuracy = test_step(data_loader=test_loader,
             model=vgg_model,
             loss_fn=loss_fn,
             accuracy_fn=accuracy_fn,
             device=device
         )
 
+        train_loss_arr.append(train_loss)
+        train_accuracy_arr.append(train_accuracy)
+        test_loss_arr.append(test_loss)
+        test_accuracy_arr.append(test_accuracy)
+
     torch.save(obj=vgg_model.state_dict(), # only saving the state_dict() only saves the learned parameters
         f='data/vgg.pth')
+    
+    plot_loss_curves({
+        "train_loss": train_loss_arr,
+        "test_loss": test_loss_arr,
+        "train_acc": train_accuracy_arr,
+        "test_acc": test_accuracy_arr
+    })    
+
 
 
 if __name__ == '__main__':
