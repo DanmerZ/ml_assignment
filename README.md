@@ -3,7 +3,9 @@
 Authors: 
     Oleh Pomazan <oleh.pomazan@ue-germany.de> 31566448
 
-# Kaggle
+# Links
+
+Github repo https://github.com/DanmerZ/ml_assignment
 
 The whole solution in a single Jupyter notebook deployed on Kaggle
 https://www.kaggle.com/code/danmerz/urbansound8kclassification
