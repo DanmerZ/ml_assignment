@@ -9,7 +9,7 @@ Files:
  - features.py: audio features extraction code using librosa library
  - model.py: implementation of VGG11 CNN for spectrogram classification
  - dataset.py: PyTorch datasets and dataloaders
- - train.py: training VGG1 using spectograms
+ - train.py: training VGG1 using spectrograms
 
 ## Dataset:
 
