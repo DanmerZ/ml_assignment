@@ -24,3 +24,5 @@ input
 ```
 
 Pre-trained weights for VGG11 model and `extracted_features.csv/.pcl` are in `data` directory.
+
+Training loss and accuracy ![alt Metrics](data/metrics.png "Metrics")
