@@ -3,7 +3,12 @@
 Authors: 
     Oleh Pomazan <oleh.pomazan@ue-germany.de> 31566448
 
-Files:
+# Kaggle
+
+The whole solution in a single Jupyter notebook deployed on Kaggle
+https://www.kaggle.com/code/danmerz/urbansound8kclassification
+
+# Files:
  - report.ipynb: main solution with explanations 
  - knn.py: implementation of k-nearest neighbors classification in Numpy
  - features.py: audio features extraction code using librosa library
