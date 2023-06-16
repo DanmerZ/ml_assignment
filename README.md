@@ -1,7 +1,9 @@
 # ML assignment solution
 
-Authors: 
-    Oleh Pomazan <oleh.pomazan@ue-germany.de> 31566448
+Authors:
+ - Oleh Pomazan <oleh.pomazan@ue-germany.de> 31566448
+ - Iryna Tyshchenko <iryna.tyshchenko@ue-germany.de> 45983811
+ - Vitalii Tsiapa <vitalii.tsiapa@ue-germany.de> 37864347
 
 # Links
 
@@ -11,7 +13,7 @@ The whole solution in a single Jupyter notebook deployed on Kaggle
 https://www.kaggle.com/code/danmerz/urbansound8kclassification
 
 # Files:
- - report.ipynb: main solution with explanations 
+ - report.ipynb: main solution with explanations
  - knn.py: implementation of k-nearest neighbors classification in Numpy
  - features.py: audio features extraction code using librosa library
  - model.py: implementation of VGG11 CNN for spectrogram classification
