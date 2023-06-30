@@ -14,6 +14,7 @@ class AudioFeatureExtractor:
         return [np.mean(feature) for feature in librosa.feature.mfcc(y=x, n_mfcc=40)]
 
     def extract_features(self, path_to_audio: str) -> np.array:
+        # Load audio file and extract features
         x, sr = librosa.load(path=path_to_audio)
 
         features = self.mean_mfccs(x)
@@ -30,20 +31,18 @@ class AudioFeatureExtractor:
         return (features, self.spectrogram(wav=x, sr=sr))
 
     def spectrogram(self, wav, sr=None, n_fft=2048, hop_length=512, n_mels=128, fmin=20, fmax=8300, top_db=80):
-        # From https://medium.com/@hasithsura/audio-classification-d37a82d6715
-        # wav,sr = librosa.load(file_path,sr=sr)
-        if wav.shape[0]<5*sr:
-            wav = np.pad(wav,int(np.ceil((5*sr-wav.shape[0])/2)),mode='reflect')
+        # Compute the spectrogram of the audio signal
+        if wav.shape[0] < 5 * sr:
+            wav = np.pad(wav, int(np.ceil((5 * sr - wav.shape[0]) / 2)), mode='reflect')
         else:
-            wav = wav[:5*sr]
+            wav = wav[:5 * sr]
         spec = librosa.feature.melspectrogram(y=wav, sr=sr, n_fft=n_fft,
-                    hop_length=hop_length,n_mels=n_mels,fmin=fmin,fmax=fmax)
-        spec_db = librosa.power_to_db(spec,top_db=top_db)
-        # return spec_db
+                                              hop_length=hop_length, n_mels=n_mels, fmin=fmin, fmax=fmax)
+        spec_db = librosa.power_to_db(spec, top_db=top_db)
         return self.spec_to_image(spec_db)
 
     def spec_to_image(self, spec, eps=1e-6):
-        # From https://medium.com/@hasithsura/audio-classification-d37a82d6715
+        # Normalize and scale the spectrogram
         mean = spec.mean()
         std = spec.std()
         spec_norm = (spec - mean) / (std + eps)
@@ -53,16 +52,15 @@ class AudioFeatureExtractor:
         return spec_scaled
 
     def spectrogram_from_file(self, file):
+        # Load audio file and compute spectrogram
         x, sr = librosa.load(path=file)
         return self.spectrogram(wav=x, sr=sr)
 
 def extract_features_from_urban8k_dataset(project_root_dir=".", istop=None, pickle=False):
     """
-    UrbanSound8K dataset
-    http://serv.cusp.nyu.edu/projects/urbansounddataset
-
-    Extracts features into CSV file
+    Extracts audio features from the UrbanSound8K dataset and saves them into a CSV file.
     """
+
     df = pd.read_csv(f'{project_root_dir}/input/metadata/UrbanSound8K.csv')
     feature_extractor = AudioFeatureExtractor()
 
@@ -76,6 +74,8 @@ def extract_features_from_urban8k_dataset(project_root_dir=".", istop=None, pick
                 continue
 
             path = root + "/" + file
+
+            # Extract features and retrieve class information from the dataset metadata
             features, spectrogram = feature_extractor.extract_features(path)
             class_ = df.loc[df['slice_file_name'] == file]['class'].values
             class_id = df.loc[df['slice_file_name'] == file]['classID'].values
@@ -111,7 +111,9 @@ def extract_features_from_urban8k_dataset(project_root_dir=".", istop=None, pick
     return audio_files_info
 
 def read_features_from_csv(path_to_csv="data/extracted_features.csv"):
-    # frame = pd.read_csv(path_to_csv, converters={'features': lambda x: np.array(pd.eval(x)) })
+    """
+    Read audio features from a CSV file.
+    """
     frame = pd.read_csv(path_to_csv, converters={'features': pd.eval })
 
     train_frame, test_frame = train_test_split(frame, test_size=0.2, random_state=RANDOM_STATE)
@@ -125,11 +127,12 @@ def read_features_from_csv(path_to_csv="data/extracted_features.csv"):
     return (train_frame, test_frame, x_train, x_test, y_train, y_test)
 
 def read_features_from_pickle(path_to_pickle="data/extracted_features.pkl"):
+    """
+    Read audio features from a pickle file.
+    """
     frame = pd.read_pickle(path_to_pickle)
 
     train_frame, test_frame = train_test_split(frame, test_size=0.2, random_state=RANDOM_STATE)
-
-    # return train_frame, test_frame
 
     x_train = np.array(train_frame["features"].values.tolist())
     x_test = np.array(test_frame["features"].values.tolist())
@@ -142,7 +145,5 @@ def read_features_from_pickle(path_to_pickle="data/extracted_features.pkl"):
     return (train_frame, test_frame, x_train, x_test, y_train, y_test, spectrogram_train, spectrogram_test)
 
 if __name__ == '__main__':
+    # Extract features from the UrbanSound8K dataset
     extract_features_from_urban8k_dataset(istop=None, pickle=True)
-    # read_features_from_csv()
-    # read_features_from_pickle()
-
